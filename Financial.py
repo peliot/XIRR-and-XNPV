@@ -16,9 +16,12 @@ def secant_method(tol, f, x0):
     
     x(n+1) = x(n) - f(x(n))*(x(n)-x(n-1))/(f(x(n))-f(x(n-1)))
     
-    Warning: This implementation is simple and does not handle cases where there is no solution. A future implementation could limit the number of iterations. There is also an implementation of the secant solver in the scipy.optimize module that can be used as a replacement.
+    Warning 
+    --------
+    This implementation is simple and does not handle cases where there is no solution. A future implementation could limit the number of iterations. There is also an implementation of the secant solver in the scipy.optimize module that can be used as a replacement.
 
     """
+
     x1 = x0*1.1
     while (abs(x1-x0)/abs(x1) > tol):
         x0, x1 = x1, x1-f(x1)*(x1-x0)/(f(x1)-f(x0))
@@ -32,15 +35,20 @@ def xnpv(rate,cashflows):
     ---------
     * rate: the discount rate to be applied to the cash flows
     * cashflows: a list object in which each element is a tuple of the form (date, amount), where date is a python datetime.date object and amount is an integer or floating point number. Cash outflows (investments) are represented with negative amounts, and cash inflows (returns) are positive amounts.
-
-    Implementation
-    ---------------
-    The Net Present Value is the sum of the discounted value of each of cash flows. The discounted value of a given cash flow is A/(1+r)**(t-t0), where A is the amount, r is the discout rate, and (t-t0) is the time in years from the date of the first cash flow in the series (t0) to the date of the cash flow being added to the sum (t).  
     
+    Returns
+    -------
+    * returns a single value which is the NPV of the given cash flows.
+
+    Notes
+    ---------------
+    * The Net Present Value is the sum of each of cash flows discounted back to the date of the first cash flow. The discounted value of a given cash flow is A/(1+r)**(t-t0), where A is the amount, r is the discout rate, and (t-t0) is the time in years from the date of the first cash flow in the series (t0) to the date of the cash flow being added to the sum (t).  
+    * This function is equivalent to the Microsoft Excel function of the same name. 
+
     """
 
     chron_order = sorted(cashflows, key = lambda x: x[0])
-    t0 = chron_order[0][0] #t0 is earliest occuring date
+    t0 = chron_order[0][0] #t0 is the date of the first cash flow
 
     return sum([cf/(1+rate)**((t-t0).days/365.0) for (t,cf) in chron_order])
 
@@ -53,9 +61,15 @@ def xirr(cashflows,guess=0.1):
     * cashflows: a list object in which each element is a tuple of the form (date, amount), where date is a python datetime.date object and amount is an integer or floating point number. Cash outflows (investments) are represented with negative amounts, and cash inflows (returns) are positive amounts.
     * guess (optional, default = 0.1): a guess at the solution to be used as a starting point for the numerical solution. 
 
-    Implementation
+    Returns
+    --------
+    * Returns the IRR as a single value
+    
+    Notes
     ----------------
-    The Internal Rate of Return (IRR) is the discount rate at which the Net Present Value (NPV) of a series of cash flows is equal to zero. The NPV of the series of cash flows is determined using the xnpv function in this module. The discount rate at which NPV equals zero is found using the secant method of numerical solution. The secant_method function can be found in this module as well.
+    * The Internal Rate of Return (IRR) is the discount rate at which the Net Present Value (NPV) of a series of cash flows is equal to zero. The NPV of the series of cash flows is determined using the xnpv function in this module. The discount rate at which NPV equals zero is found using the secant method of numerical solution. 
+    * This function is equivalent to the Microsoft Excel function of the same name.
+    * This implementation uses the secant_method defined in this module. The secant_method here does not fail gracefully in cases in which there is no solution. For a more robust implementation, replace the secant_method here with the numerical solver from scipy.optimize (which will use the same secant method).
 
     """
     
