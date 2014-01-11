@@ -1,4 +1,5 @@
 import datetime
+from scipy import optimize 
 
 def secant_method(tol, f, x0):
     """
@@ -18,7 +19,7 @@ def secant_method(tol, f, x0):
     
     Warning 
     --------
-    This implementation is simple and does not handle cases where there is no solution. A future implementation could limit the number of iterations. There is also an implementation of the secant solver in the scipy.optimize module that can be used as a replacement.
+    This implementation is simple and does not handle cases where there is no solution. Users requiring a more robust version should use scipy package optimize.newton.
 
     """
 
@@ -69,9 +70,10 @@ def xirr(cashflows,guess=0.1):
     ----------------
     * The Internal Rate of Return (IRR) is the discount rate at which the Net Present Value (NPV) of a series of cash flows is equal to zero. The NPV of the series of cash flows is determined using the xnpv function in this module. The discount rate at which NPV equals zero is found using the secant method of numerical solution. 
     * This function is equivalent to the Microsoft Excel function of the same name.
-    * This implementation uses the secant_method defined in this module. The secant_method here does not fail gracefully in cases in which there is no solution. For a more robust implementation, replace the secant_method here with the numerical solver from scipy.optimize (which will use the same secant method).
+    * For users that do not have the scipy module installed, there is an alternate version (commented out) that uses the secant_method function defined in the module rather than the scipy.optimize module's numerical solver. Both use the same method of calculation so there should be no difference in performance, but the secant_method function does not fail gracefully in cases where there is no solution, so the scipy.optimize.newton version is preferred.
 
     """
     
-    return secant_method(0.0001,lambda r: xnpv(r,cashflows),guess)
+    #return secant_method(0.0001,lambda r: xnpv(r,cashflows),guess)
+    return optimize.newton(lambda r: xnpv(r,cashflows),guess)
 
